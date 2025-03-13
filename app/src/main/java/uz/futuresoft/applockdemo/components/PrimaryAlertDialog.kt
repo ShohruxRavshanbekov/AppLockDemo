@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo
+package uz.futuresoft.applockdemo.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,9 +14,11 @@ import androidx.compose.ui.window.DialogProperties
 import uz.futuresoft.applockdemo.ui.theme.AppLockDemoTheme
 
 @Composable
-fun AccessibilityServiceIsNotEnableDialog(
+fun PrimaryAlertDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
+    title: String? = null,
+    text: String? = null,
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -25,34 +27,30 @@ fun AccessibilityServiceIsNotEnableDialog(
                 Text(text = "Settings")
             }
         },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-//        dismissButton = {
-//            TextButton(onClick = onDismissRequest) {
-//                Text(text = "Cancel")
-//            }
-//        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = "Cancel")
+            }
+        },
         icon = {},
         title = {
             Text(
-                text = "Accessibility Service is not enabled!",
+                text = title ?: "",
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )
         },
         text = {
             Text(
-                text = "To use the application, the Accessibility Service should be turned on.",
+                text = text ?: "",
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
             )
         },
-//        shape = ,
-//        containerColor =,
-//        titleContentColor =,
-//        textContentColor =,
         properties = DialogProperties(usePlatformDefaultWidth = false),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
     )
 }
 
@@ -60,6 +58,11 @@ fun AccessibilityServiceIsNotEnableDialog(
 @Composable
 private fun AccessibilityServiceIsNotEnableDialogPreview() {
     AppLockDemoTheme {
-        AccessibilityServiceIsNotEnableDialog(onDismissRequest = {}, onConfirm = {})
+        PrimaryAlertDialog(
+            onDismissRequest = {},
+            onConfirm = {},
+            title = "Accessibility Service is not enabled!",
+            text = "To use the application, the Accessibility Service should be turned on.",
+        )
     }
 }

@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo
+package uz.futuresoft.applockdemo.components
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -37,13 +37,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uz.futuresoft.applockdemo.ui.theme.AppLockDemoTheme
+import androidx.core.graphics.createBitmap
+import uz.futuresoft.applockdemo.utils.AppInfo
 
 @Composable
 fun AppItem(
     appInfo: AppInfo,
     onChangeBlockedStatus: (Boolean) -> Unit,
 ) {
-    var locked by remember { mutableStateOf(false) }
+    var locked by remember { mutableStateOf(appInfo.locked) }
     val appIconBitmap = remember { appInfo.icon?.toBitmap()?.asImageBitmap() }
 
     Row(
@@ -115,8 +117,9 @@ private fun AppItemPreview() {
         AppItem(
             appInfo = AppInfo(
                 name = "App name",
+                packageName = "package.name",
                 icon = null,
-                packageName = "package.name"
+                locked = false,
             ),
             onChangeBlockedStatus = {},
         )
@@ -124,11 +127,7 @@ private fun AppItemPreview() {
 }
 
 private fun Drawable.toBitmap(): Bitmap {
-    val bitmap = Bitmap.createBitmap(
-        this.intrinsicWidth,
-        this.intrinsicHeight,
-        Bitmap.Config.ARGB_8888
-    )
+    val bitmap = createBitmap(this.intrinsicWidth, this.intrinsicHeight)
     val canvas = Canvas(bitmap)
     this.setBounds(0, 0, canvas.width, canvas.height)
     this.draw(canvas)

@@ -68,4 +68,7 @@ dependencies {
     implementation(libs.coil.compose)
     // gson
     implementation(libs.google.gson)
+    // koin
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.navigation)
 }
