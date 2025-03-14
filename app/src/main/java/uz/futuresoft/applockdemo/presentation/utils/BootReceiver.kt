@@ -1,10 +1,10 @@
-package uz.futuresoft.applockdemo.utils
+package uz.futuresoft.applockdemo.presentation.utils
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import uz.futuresoft.applockdemo.AppBlockerService
+import uz.futuresoft.applockdemo.presentation.AppBlockerService
 
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {

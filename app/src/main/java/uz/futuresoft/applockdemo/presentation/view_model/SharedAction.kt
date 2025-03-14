@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo.view_model
+package uz.futuresoft.applockdemo.presentation.view_model
 
 import android.content.Context
 

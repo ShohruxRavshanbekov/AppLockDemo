@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo.components
+package uz.futuresoft.applockdemo.presentation.components
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -36,9 +36,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import uz.futuresoft.applockdemo.ui.theme.AppLockDemoTheme
+import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
 import androidx.core.graphics.createBitmap
-import uz.futuresoft.applockdemo.utils.AppInfo
+import uz.futuresoft.applockdemo.presentation.utils.AppInfo
 
 @Composable
 fun AppItem(

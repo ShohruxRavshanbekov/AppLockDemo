@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo
+package uz.futuresoft.applockdemo.presentation
 
 import android.app.Service
 import android.app.usage.UsageEvents
@@ -11,18 +11,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import uz.futuresoft.applockdemo.utils.SharedPreferencesManager
+import uz.futuresoft.applockdemo.R
+import uz.futuresoft.applockdemo.data.SharedPreferencesManager
 
 class AppBlockerService : Service() {
-    private lateinit var sharedPreferencesManager: SharedPreferencesManager
-    private lateinit var blockedApps: List<String>
+    //    private lateinit var blockedApps: List<String>
     private var isRunning = false
 
     override fun onCreate() {
         super.onCreate()
         isRunning = true
-        sharedPreferencesManager = SharedPreferencesManager(context = this)
-        blockedApps = sharedPreferencesManager.getBlockedApps()
+//        blockedApps = SharedPreferencesManager2.getBlockedApps()
+
+//        sharedViewModel.blockedAppsObserver.observeForever {
+//            blockedApps = it
+//        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -33,39 +36,47 @@ class AppBlockerService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onDestroy() {
+        super.onDestroy()
+        isRunning = false
+    }
+
     private fun startAppMonitoring() {
         CoroutineScope(Dispatchers.IO).launch {
             while (isRunning) {
-                val foregroundApp = getForegroundApp(this@AppBlockerService)
-                if (blockedApps.contains(foregroundApp)) {
-                    showLockScreen(packageName = foregroundApp)
+                val blockedApps = SharedPreferencesManager.getBlockedApps()
+                val launchedApp = getLaunchedApp(this@AppBlockerService)
+                if (blockedApps.contains(launchedApp)) {
+                    showLockScreen(packageName = launchedApp)
                 }
                 delay(1000)
             }
         }
     }
 
-    private fun getForegroundApp(context: Context): String? {
+    private fun getLaunchedApp(context: Context): String? {
         val usageManager =
             context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val time = System.currentTimeMillis()
         val usageEvents = usageManager.queryEvents(time - 5000, time)
         val event = UsageEvents.Event()
-        var lastApp: String? = null
+        var launchedApp: String? = null
 
         while (usageEvents.hasNextEvent()) {
             usageEvents.getNextEvent(event)
             if (event.eventType == UsageEvents.Event.ACTIVITY_RESUMED) {
-                lastApp = event.packageName
+                launchedApp = event.packageName
             }
         }
-        return lastApp
+        return launchedApp
     }
 
     // This method shows the lock screen on top of the blocked app
     private fun showLockScreen(packageName: String?) {
         val intent = Intent(this, BlockScreenActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
         intent.putExtra("packageName", packageName)
         startActivity(intent)
     }
@@ -82,15 +93,10 @@ class AppBlockerService : Service() {
         val channelId = "app_block_channel"
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Blocked apps")
-            .setContentText(blockedApps.joinToString(separator = ",\n"))
+            .setContentTitle("App blocker is running")
+            .setContentText("Some apps are blocked")
             .build()
 
         startForeground(1, notification)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        isRunning = false
     }
 }

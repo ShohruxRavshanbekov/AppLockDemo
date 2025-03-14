@@ -1,6 +1,6 @@
-package uz.futuresoft.applockdemo.view_model
+package uz.futuresoft.applockdemo.presentation.view_model
 
-import uz.futuresoft.applockdemo.utils.AppInfo
+import uz.futuresoft.applockdemo.presentation.utils.AppInfo
 
 data class SharedState(
     val app: AppInfo? = null,

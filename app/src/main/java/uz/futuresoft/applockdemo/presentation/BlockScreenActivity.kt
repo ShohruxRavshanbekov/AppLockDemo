@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo
+package uz.futuresoft.applockdemo.presentation
 
 import android.content.Context
 import android.content.Intent
@@ -15,21 +15,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import uz.futuresoft.applockdemo.ui.theme.AppLockDemoTheme
-import uz.futuresoft.applockdemo.view_model.SharedAction
-import uz.futuresoft.applockdemo.view_model.SharedState
-import uz.futuresoft.applockdemo.view_model.SharedViewModel
+import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
+import uz.futuresoft.applockdemo.presentation.view_model.SharedState
+import uz.futuresoft.applockdemo.presentation.view_model.SharedViewModel
 
 class BlockScreenActivity : ComponentActivity() {
 
-    private val viewModel: SharedViewModel by viewModels { SharedViewModel.Factory }
+    private val viewModel: SharedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

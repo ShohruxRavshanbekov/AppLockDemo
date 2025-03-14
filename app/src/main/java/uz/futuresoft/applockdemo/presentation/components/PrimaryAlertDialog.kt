@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo.components
+package uz.futuresoft.applockdemo.presentation.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,7 +11,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import uz.futuresoft.applockdemo.ui.theme.AppLockDemoTheme
+import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
 
 @Composable
 fun PrimaryAlertDialog(

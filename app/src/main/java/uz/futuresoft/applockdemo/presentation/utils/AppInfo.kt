@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo.utils
+package uz.futuresoft.applockdemo.presentation.utils
 
 import android.graphics.drawable.Drawable
 

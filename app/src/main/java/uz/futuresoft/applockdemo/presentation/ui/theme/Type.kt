@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo.ui.theme
+package uz.futuresoft.applockdemo.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

@@ -1,16 +1,20 @@
-package uz.futuresoft.applockdemo
+package uz.futuresoft.applockdemo.presentation
 
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import uz.futuresoft.applockdemo.utils.SharedPreferencesManager2
 
 class App : Application() {
+    companion object {
+        lateinit var instance: App
+            private set
+    }
+
     override fun onCreate() {
         super.onCreate()
-        SharedPreferencesManager2.create(context = this)
+        instance = this
         createNotificationChannel()
     }
 

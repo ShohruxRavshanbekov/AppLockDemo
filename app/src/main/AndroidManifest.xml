@@ -11,7 +11,7 @@
         tools:ignore="ProtectedPermissions" />
 
     <application
-        android:name=".App"
+        android:name=".presentation.App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -22,14 +22,14 @@
         android:theme="@style/Theme.AppLockDemo"
         tools:targetApi="31">
         <activity
-            android:name=".BlockScreenActivity"
+            android:name=".presentation.BlockScreenActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.AppLockDemo">
             <intent-filter>
@@ -40,12 +40,12 @@
         </activity>
 
         <service
-            android:name=".AppBlockerService"
+            android:name=".presentation.AppBlockerService"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
 
         <receiver
-            android:name=".utils.BootReceiver"
+            android:name=".presentation.utils.BootReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

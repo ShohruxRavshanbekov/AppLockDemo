@@ -1,39 +1,33 @@
-package uz.futuresoft.applockdemo.view_model
+package uz.futuresoft.applockdemo.presentation.view_model
 
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import uz.futuresoft.applockdemo.utils.AppInfo
-import uz.futuresoft.applockdemo.utils.SharedPreferencesManager
-import uz.futuresoft.applockdemo.utils.SharedPreferencesManager2
+import uz.futuresoft.applockdemo.presentation.utils.AppInfo
+import uz.futuresoft.applockdemo.data.SharedPreferencesManager
 
-class SharedViewModel(
-    private val sharedPreferencesManager: SharedPreferencesManager,
-) : ViewModel() {
+class SharedViewModel: ViewModel() {
 //    private val _sharedUiState = MutableSharedFlow<SharedState>()
 //    val sharedUiState: SharedFlow<SharedState> = _sharedUiState.asSharedFlow()
 
     private val _sharedUiState = MutableStateFlow(SharedState())
     val sharedUiState: StateFlow<SharedState> = _sharedUiState.asStateFlow()
 
+    private val _blockedAppsObserver = MutableLiveData<List<String>>()
+    val blockedAppsObserver: LiveData<List<String>> = _blockedAppsObserver
+
     private var blockedApps: List<String> = emptyList()
 
     init {
-//        blockedApps = sharedPreferencesManager.getBlockedApps()
-        blockedApps = SharedPreferencesManager2.getBlockedApps()
-//        viewModelScope.launch {
-//            _sharedUiState.emit(SharedState(blockedApps = blockedApps))
-//        }
+        blockedApps = SharedPreferencesManager.getBlockedApps()
         _sharedUiState.update { it.copy(blockedApps = blockedApps) }
     }
 
@@ -63,27 +57,15 @@ class SharedViewModel(
                 name = it.loadLabel(packageManager).toString(),
                 packageName = it.activityInfo.packageName,
                 icon = it.loadIcon(packageManager),
-                locked = SharedPreferencesManager2.isAppBlocked(packageName = it.activityInfo.packageName),
+                locked = SharedPreferencesManager.isAppBlocked(packageName = it.activityInfo.packageName),
 //                locked = sharedPreferencesManager.isAppBlocked(packageName = it.activityInfo.packageName),
             )
         }
-//        viewModelScope.launch {
-//            _sharedUiState.emit(SharedState(apps = mappedApps))
-//        }
         _sharedUiState.update { it.copy(apps = mappedApps) }
         return mappedApps
     }
 
     private fun getApp(context: Context, packageName: String?) {
-//        viewModelScope.launch {
-//            _sharedUiState.emit(
-//                SharedState(
-//                    app = getApps(context = context).find {
-//                        it.packageName == (packageName ?: "")
-//                    },
-//                )
-//            )
-//        }
         _sharedUiState.update { currentState ->
             currentState.copy(
                 app = getApps(context = context).find { it.packageName == (packageName ?: "") },
@@ -99,18 +81,17 @@ class SharedViewModel(
         } else {
             blockedApps.remove(packageName)
         }
-//        sharedPreferencesManager.saveBlockedApps(apps = blockedApps)
-        SharedPreferencesManager2.saveBlockedApps(apps = blockedApps)
+        SharedPreferencesManager.saveBlockedApps(apps = blockedApps)
     }
 
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val context =
-                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
-                val sharedPreferencesManager = SharedPreferencesManager(context = context)
-                SharedViewModel(sharedPreferencesManager = sharedPreferencesManager)
-            }
-        }
-    }
+//    companion object {
+//        val Factory: ViewModelProvider.Factory = viewModelFactory {
+//            initializer {
+//                val context =
+//                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
+//                val sharedPreferencesManager = SharedPreferencesManager2(context = context)
+//                SharedViewModel(sharedPreferencesManager = sharedPreferencesManager)
+//            }
+//        }
+//    }
 }

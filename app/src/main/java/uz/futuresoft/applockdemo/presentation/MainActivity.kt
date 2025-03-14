@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo
+package uz.futuresoft.applockdemo.presentation
 
 import android.Manifest
 import android.app.Activity
@@ -33,17 +33,17 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import uz.futuresoft.applockdemo.components.AppItem
-import uz.futuresoft.applockdemo.components.PrimaryAlertDialog
-import uz.futuresoft.applockdemo.ui.theme.AppLockDemoTheme
-import uz.futuresoft.applockdemo.utils.AppInfo
-import uz.futuresoft.applockdemo.view_model.SharedAction
-import uz.futuresoft.applockdemo.view_model.SharedState
-import uz.futuresoft.applockdemo.view_model.SharedViewModel
+import uz.futuresoft.applockdemo.presentation.components.AppItem
+import uz.futuresoft.applockdemo.presentation.components.PrimaryAlertDialog
+import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
+import uz.futuresoft.applockdemo.presentation.utils.AppInfo
+import uz.futuresoft.applockdemo.presentation.view_model.SharedAction
+import uz.futuresoft.applockdemo.presentation.view_model.SharedState
+import uz.futuresoft.applockdemo.presentation.view_model.SharedViewModel
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: SharedViewModel by viewModels { SharedViewModel.Factory }
+    private val viewModel: SharedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
