@@ -38,7 +38,7 @@ class AppBlockerService : Service() {
             while (isRunning) {
                 val foregroundApp = getForegroundApp(this@AppBlockerService)
                 if (blockedApps.contains(foregroundApp)) {
-                    blockApp(packageName = foregroundApp)
+                    showLockScreen(packageName = foregroundApp)
                 }
                 delay(1000)
             }
@@ -63,7 +63,7 @@ class AppBlockerService : Service() {
     }
 
     // This method shows the lock screen on top of the blocked app
-    private fun blockApp(packageName: String?) {
+    private fun showLockScreen(packageName: String?) {
         val intent = Intent(this, BlockScreenActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         intent.putExtra("packageName", packageName)
@@ -71,7 +71,7 @@ class AppBlockerService : Service() {
     }
 
     // This method immediately closes the blocked app
-    private fun blockApp() {
+    private fun closeApp() {
         val homeIntent = Intent(Intent.ACTION_MAIN)
         homeIntent.addCategory(Intent.CATEGORY_HOME)
         homeIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

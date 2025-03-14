@@ -5,10 +5,12 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import uz.futuresoft.applockdemo.utils.SharedPreferencesManager2
 
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
+        SharedPreferencesManager2.create(context = this)
         createNotificationChannel()
     }
 
@@ -22,7 +24,8 @@ class App : Application() {
                 channelName,
                 NotificationManager.IMPORTANCE_LOW,
             )
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
