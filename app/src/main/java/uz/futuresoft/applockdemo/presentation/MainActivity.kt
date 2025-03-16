@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.androidx.compose.koinViewModel
 import uz.futuresoft.applockdemo.presentation.components.AppItem
 import uz.futuresoft.applockdemo.presentation.components.PrimaryAlertDialog
 import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
@@ -42,15 +43,12 @@ import uz.futuresoft.applockdemo.presentation.view_model.SharedState
 import uz.futuresoft.applockdemo.presentation.view_model.SharedViewModel
 
 class MainActivity : ComponentActivity() {
-
-    private val viewModel: SharedViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestRequiredPermissions(activity = this)
-
         enableEdgeToEdge()
         setContent {
+            val viewModel = koinViewModel<SharedViewModel>()
             val sharedUiState by viewModel.sharedUiState.collectAsStateWithLifecycle()
             val usageAccessAllowed by remember {
                 mutableStateOf(isUsageAccessPermissionAllowed(context = this))

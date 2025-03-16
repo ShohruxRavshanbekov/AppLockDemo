@@ -15,17 +15,11 @@ import uz.futuresoft.applockdemo.R
 import uz.futuresoft.applockdemo.data.SharedPreferencesManager
 
 class AppBlockerService : Service() {
-    //    private lateinit var blockedApps: List<String>
     private var isRunning = false
 
     override fun onCreate() {
         super.onCreate()
         isRunning = true
-//        blockedApps = SharedPreferencesManager2.getBlockedApps()
-
-//        sharedViewModel.blockedAppsObserver.observeForever {
-//            blockedApps = it
-//        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

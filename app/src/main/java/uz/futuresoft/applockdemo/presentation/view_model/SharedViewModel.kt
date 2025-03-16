@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import uz.futuresoft.applockdemo.presentation.utils.AppInfo
 import uz.futuresoft.applockdemo.data.SharedPreferencesManager
+import uz.futuresoft.applockdemo.data.SharedPreferencesManager2
 
-class SharedViewModel: ViewModel() {
-//    private val _sharedUiState = MutableSharedFlow<SharedState>()
-//    val sharedUiState: SharedFlow<SharedState> = _sharedUiState.asSharedFlow()
-
+class SharedViewModel(
+    private val sharedPreferences: SharedPreferencesManager2,
+) : ViewModel() {
     private val _sharedUiState = MutableStateFlow(SharedState())
     val sharedUiState: StateFlow<SharedState> = _sharedUiState.asStateFlow()
 
@@ -27,7 +27,7 @@ class SharedViewModel: ViewModel() {
     private var blockedApps: List<String> = emptyList()
 
     init {
-        blockedApps = SharedPreferencesManager.getBlockedApps()
+        blockedApps = sharedPreferences.getBlockedApps()
         _sharedUiState.update { it.copy(blockedApps = blockedApps) }
     }
 
@@ -57,7 +57,7 @@ class SharedViewModel: ViewModel() {
                 name = it.loadLabel(packageManager).toString(),
                 packageName = it.activityInfo.packageName,
                 icon = it.loadIcon(packageManager),
-                locked = SharedPreferencesManager.isAppBlocked(packageName = it.activityInfo.packageName),
+                locked = sharedPreferences.isAppBlocked(packageName = it.activityInfo.packageName),
 //                locked = sharedPreferencesManager.isAppBlocked(packageName = it.activityInfo.packageName),
             )
         }
@@ -81,7 +81,7 @@ class SharedViewModel: ViewModel() {
         } else {
             blockedApps.remove(packageName)
         }
-        SharedPreferencesManager.saveBlockedApps(apps = blockedApps)
+        sharedPreferences.saveBlockedApps(apps = blockedApps)
     }
 
 //    companion object {

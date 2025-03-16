@@ -5,6 +5,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+import uz.futuresoft.applockdemo.data.di.dataModule
+import uz.futuresoft.applockdemo.presentation.di.uiModule
 
 class App : Application() {
     companion object {
@@ -14,6 +19,11 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        startKoin {
+            androidLogger()
+            androidContext(this@App)
+            modules(dataModule, uiModule)
+        }
         instance = this
         createNotificationChannel()
     }
