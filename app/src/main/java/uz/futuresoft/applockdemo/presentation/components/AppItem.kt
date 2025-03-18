@@ -1,12 +1,8 @@
 package uz.futuresoft.applockdemo.presentation.components
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material3.Icon
@@ -31,22 +26,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
-import androidx.core.graphics.createBitmap
 import uz.futuresoft.applockdemo.presentation.utils.AppInfo
+import uz.futuresoft.applockdemo.utils.getAppIcon
 
 @Composable
 fun AppItem(
     appInfo: AppInfo,
-    onChangeBlockedStatus: (Boolean) -> Unit,
+    onChangeLockStatus: (Boolean) -> Unit,
 ) {
+    val context = LocalContext.current
     var locked by remember { mutableStateOf(appInfo.locked) }
-    val appIconBitmap = remember { appInfo.icon?.toBitmap()?.asImageBitmap() }
+    val appIconBitmap = remember {
+        appInfo.packageName.getAppIcon(context).asImageBitmap()
+    }
 
     Row(
         modifier = Modifier
@@ -57,7 +56,12 @@ fun AppItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        if (appIconBitmap != null) {
+        Image(
+            bitmap = appIconBitmap,
+            contentDescription = appInfo.name,
+            modifier = Modifier.size(50.dp),
+        )
+        /*if (appIconBitmap != null) {
             Image(
                 bitmap = appIconBitmap,
                 contentDescription = appInfo.name,
@@ -77,7 +81,7 @@ fun AppItem(
                     tint = Color.White,
                 )
             }
-        }
+        }*/
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -99,7 +103,7 @@ fun AppItem(
         IconButton(
             onClick = {
                 locked = !locked
-                onChangeBlockedStatus(locked)
+                onChangeLockStatus(locked)
             }
         ) {
             Icon(
@@ -118,18 +122,9 @@ private fun AppItemPreview() {
             appInfo = AppInfo(
                 name = "App name",
                 packageName = "package.name",
-                icon = null,
                 locked = false,
             ),
-            onChangeBlockedStatus = {},
+            onChangeLockStatus = {},
         )
     }
-}
-
-private fun Drawable.toBitmap(): Bitmap {
-    val bitmap = createBitmap(this.intrinsicWidth, this.intrinsicHeight)
-    val canvas = Canvas(bitmap)
-    this.setBounds(0, 0, canvas.width, canvas.height)
-    this.draw(canvas)
-    return bitmap
 }

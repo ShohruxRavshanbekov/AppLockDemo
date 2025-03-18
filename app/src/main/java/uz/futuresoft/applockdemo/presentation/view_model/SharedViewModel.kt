@@ -3,7 +3,6 @@ package uz.futuresoft.applockdemo.presentation.view_model
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ResolveInfo
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,11 +11,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import uz.futuresoft.applockdemo.presentation.utils.AppInfo
-import uz.futuresoft.applockdemo.data.SharedPreferencesManager
-import uz.futuresoft.applockdemo.data.SharedPreferencesManager2
+import uz.futuresoft.applockdemo.data.database.AppDatabase
+import uz.futuresoft.applockdemo.presentation.utils.toAppEntity
+import uz.futuresoft.applockdemo.presentation.utils.toAppInfo
 
 class SharedViewModel(
-    private val sharedPreferences: SharedPreferencesManager2,
+    private val database: AppDatabase,
 ) : ViewModel() {
     private val _sharedUiState = MutableStateFlow(SharedState())
     val sharedUiState: StateFlow<SharedState> = _sharedUiState.asStateFlow()
@@ -24,18 +24,18 @@ class SharedViewModel(
     private val _blockedAppsObserver = MutableLiveData<List<String>>()
     val blockedAppsObserver: LiveData<List<String>> = _blockedAppsObserver
 
-    private var blockedApps: List<String> = emptyList()
+//    private var blockedApps: List<String> = emptyList()
 
     init {
-        blockedApps = sharedPreferences.getBlockedApps()
-        _sharedUiState.update { it.copy(blockedApps = blockedApps) }
+//        blockedApps = sharedPreferences.getBlockedApps()
+//        _sharedUiState.update { it.copy(blockedApps = blockedApps) }
     }
 
     fun onAction(action: SharedAction) {
         when (action) {
             is SharedAction.GetApps -> getApps(context = action.context)
-            is SharedAction.OnChangeAppBlockedStatus -> changeAppBlockedStatus(
-                status = action.status,
+            is SharedAction.OnChangeAppBlockedStatus -> changeAppLockStatus(
+                locked = action.status,
                 packageName = action.packageName
             )
 
@@ -56,12 +56,16 @@ class SharedViewModel(
             AppInfo(
                 name = it.loadLabel(packageManager).toString(),
                 packageName = it.activityInfo.packageName,
-                icon = it.loadIcon(packageManager),
-                locked = sharedPreferences.isAppBlocked(packageName = it.activityInfo.packageName),
-//                locked = sharedPreferencesManager.isAppBlocked(packageName = it.activityInfo.packageName),
+                locked = database.appDao.getApp(packageName = it.activityInfo.packageName).locked,
+//                locked = sharedPreferences.isAppBlocked(packageName = it.activityInfo.packageName),
             )
         }
-        _sharedUiState.update { it.copy(apps = mappedApps) }
+        database.appDao.insertAll(mappedApps.map { it.toAppEntity() })
+        _sharedUiState.update {
+            it.copy(
+                apps = database.appDao.getApps().map { appEntity -> appEntity.toAppInfo() }
+            )
+        }
         return mappedApps
     }
 
@@ -71,27 +75,21 @@ class SharedViewModel(
                 app = getApps(context = context).find { it.packageName == (packageName ?: "") },
             )
         }
-        Log.d("AAAAA", "getApp: ${_sharedUiState.value.app}")
     }
 
-    private fun changeAppBlockedStatus(status: Boolean, packageName: String) {
-        val blockedApps = this.blockedApps.toMutableList()
-        if (status) {
-            blockedApps.add(packageName)
-        } else {
-            blockedApps.remove(packageName)
+    private fun changeAppLockStatus(locked: Boolean, packageName: String) {
+        database.appDao.changeAppLockStatus(packageName = packageName, locked = locked)
+        _sharedUiState.update {
+            it.copy(
+                apps = database.appDao.getApps().map { appEntity -> appEntity.toAppInfo() }
+            )
         }
-        sharedPreferences.saveBlockedApps(apps = blockedApps)
-    }
-
-//    companion object {
-//        val Factory: ViewModelProvider.Factory = viewModelFactory {
-//            initializer {
-//                val context =
-//                    this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as Application
-//                val sharedPreferencesManager = SharedPreferencesManager2(context = context)
-//                SharedViewModel(sharedPreferencesManager = sharedPreferencesManager)
-//            }
+//        val blockedApps = this.blockedApps.toMutableList()
+//        if (status) {
+//            blockedApps.add(packageName)
+//        } else {
+//            blockedApps.remove(packageName)
 //        }
-//    }
+//        sharedPreferences.saveBlockedApps(apps = blockedApps)
+    }
 }

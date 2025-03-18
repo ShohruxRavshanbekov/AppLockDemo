@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uz.futuresoft.applockdemo.R
-import uz.futuresoft.applockdemo.data.SharedPreferencesManager
+import uz.futuresoft.applockdemo.data.SharedPreferencesManager2
 
 class AppBlockerService : Service() {
     private var isRunning = false
@@ -38,7 +38,7 @@ class AppBlockerService : Service() {
     private fun startAppMonitoring() {
         CoroutineScope(Dispatchers.IO).launch {
             while (isRunning) {
-                val blockedApps = SharedPreferencesManager.getBlockedApps()
+                val blockedApps = SharedPreferencesManager2.getBlockedApps()
                 val launchedApp = getLaunchedApp(this@AppBlockerService)
                 if (blockedApps.contains(launchedApp)) {
                     showLockScreen(packageName = launchedApp)

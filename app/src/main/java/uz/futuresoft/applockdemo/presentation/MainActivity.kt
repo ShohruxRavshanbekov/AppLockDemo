@@ -12,7 +12,6 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -101,7 +100,7 @@ fun Content(
             items(sharedUiState.apps) { appInfo ->
                 AppItem(
                     appInfo = appInfo,
-                    onChangeBlockedStatus = {
+                    onChangeLockStatus = {
                         onAction(
                             SharedAction.OnChangeAppBlockedStatus(
                                 status = it,
@@ -150,19 +149,16 @@ fun MainActivityContentPreview() {
                     AppInfo(
                         name = "Instagram",
                         packageName = "com.android.instagram",
-                        icon = null,
                         locked = false,
                     ),
                     AppInfo(
                         name = "YouTube",
                         packageName = "com.android.youtube",
-                        icon = null,
                         locked = false,
                     ),
                     AppInfo(
                         name = "Chrome",
                         packageName = "com.google.android.chrome",
-                        icon = null,
                         locked = false,
                     ),
                 ),

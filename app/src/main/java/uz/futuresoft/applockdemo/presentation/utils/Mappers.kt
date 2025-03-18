@@ -2,11 +2,18 @@ package uz.futuresoft.applockdemo.presentation.utils
 
 import uz.futuresoft.applockdemo.data.database.AppEntity
 
+fun AppInfo.toAppEntity(): AppEntity {
+    return AppEntity(
+        packageName = this.packageName,
+        name = this.name,
+        locked = this.locked,
+    )
+}
+
 fun AppEntity.toAppInfo(): AppInfo {
     return AppInfo(
-        name = this.name,
         packageName = this.packageName,
-        icon = this.icon,
+        name = this.name,
         locked = this.locked,
     )
 }

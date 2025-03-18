@@ -21,20 +21,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.androidx.compose.koinViewModel
 import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
 import uz.futuresoft.applockdemo.presentation.view_model.SharedState
 import uz.futuresoft.applockdemo.presentation.view_model.SharedViewModel
 
 class BlockScreenActivity : ComponentActivity() {
-
-    private val viewModel: SharedViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val sharedUiState by viewModel.sharedUiState.collectAsStateWithLifecycle()
-            val blockedAppPackageName = intent.getStringExtra("packageName")
+//            val viewModel = koinViewModel<SharedViewModel>()
+//            val sharedUiState by viewModel.sharedUiState.collectAsStateWithLifecycle()
+//            val blockedAppPackageName = intent.getStringExtra("packageName")
 
 //            LaunchedEffect(key1 = Unit) {
 //                viewModel.onAction(
@@ -46,7 +45,7 @@ class BlockScreenActivity : ComponentActivity() {
 //            }
 
             AppLockDemoTheme {
-                BlockScreenActivityContent(sharedUiState = sharedUiState)
+                BlockScreenActivityContent(sharedUiState = SharedState())
             }
         }
     }
