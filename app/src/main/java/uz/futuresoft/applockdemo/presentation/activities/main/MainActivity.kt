@@ -1,76 +1,70 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package uz.futuresoft.applockdemo.presentation.activities.main
 
 import android.Manifest
 import android.app.Activity
 import android.app.AppOpsManager
 import android.content.Context
-import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import android.provider.Settings
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.data.ContextCache
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
-import androidx.core.net.toUri
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
-import uz.futuresoft.applockdemo.presentation.AppBlockerService
-import uz.futuresoft.applockdemo.presentation.components.AppItem
-import uz.futuresoft.applockdemo.presentation.components.PrimaryAlertDialog
+import uz.futuresoft.applockdemo.presentation.navigation.Screens
+import uz.futuresoft.applockdemo.presentation.screens.apps.navigation.appsRoute
+import uz.futuresoft.applockdemo.presentation.screens.permissions.navigation.permissionsRoute
 import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
-import uz.futuresoft.applockdemo.presentation.utils.AppInfo
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestRequiredPermissions(activity = this)
         enableEdgeToEdge()
         setContent {
             val viewModel = koinViewModel<MainViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val usageAccessAllowed by remember {
+
+            val isNotificationPermissionAllowed by remember {
+                mutableStateOf(isNotificationPermissionAllowed(context = this))
+            }
+            val isUsageAccessPermissionAllowed by remember {
                 mutableStateOf(isUsageAccessPermissionAllowed(context = this))
             }
-            val overlayPermissionAllowed by remember {
+            val isOverlayPermissionAllowed by remember {
                 mutableStateOf(isOverlayPermissionAllowed(context = this))
             }
 
-            if (usageAccessAllowed) {
-                startAppBlockerService(context = this)
+            LaunchedEffect(
+                key1 = isUsageAccessPermissionAllowed,
+                key2 = isOverlayPermissionAllowed,
+                key3 = isNotificationPermissionAllowed,
+            ) {
+                if (
+                    isUsageAccessPermissionAllowed &&
+                    isOverlayPermissionAllowed &&
+                    isNotificationPermissionAllowed
+                ) {
+                    viewModel.onAction(MainAction.PermissionsAllowed)
+                }
             }
 
             AppLockDemoTheme {
                 MainActivityContent(
-                    context = this,
-                    uiState = uiState,
-                    usageAccessAllowed = usageAccessAllowed,
-                    overlayPermissionAllowed = overlayPermissionAllowed,
-                    onAction = viewModel::onAction
+                    startDestination = uiState.startDestination,
                 )
             }
         }
@@ -79,74 +73,15 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainActivityContent(
-    context: Context,
-    uiState: MainState,
-    usageAccessAllowed: Boolean,
-    overlayPermissionAllowed: Boolean,
-    onAction: (MainAction) -> Unit,
+    startDestination: Screens,
 ) {
-    val pullToRefreshState = rememberPullToRefreshState()
-    var isRefreshing by remember { mutableStateOf(false) }
-    var showUsageAccessAlertDialog by remember { mutableStateOf(!usageAccessAllowed) }
-    var showOverlayAlertDialog by remember { mutableStateOf(!overlayPermissionAllowed) }
-
-    LaunchedEffect(key1 = uiState.loading) {
-        isRefreshing = uiState.loading
-    }
-
-    Scaffold { innerPadding ->
-        PullToRefreshBox(
-            isRefreshing = uiState.loading,
-            onRefresh = { onAction(MainAction.RefreshData) },
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            state = pullToRefreshState,
-        ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(20.dp),
-            ) {
-                items(uiState.apps) { appInfo ->
-                    AppItem(
-                        appInfo = appInfo,
-                        onChangeLockStatus = {
-                            onAction(
-                                MainAction.ChangeAppLockedStatus(
-                                    status = it,
-                                    packageName = appInfo.packageName
-                                )
-                            )
-                        },
-                    )
-                }
-            }
-        }
-
-        if (showUsageAccessAlertDialog) {
-            PrimaryAlertDialog(
-                onDismissRequest = { showUsageAccessAlertDialog = false },
-                onConfirm = {
-                    requestUsageAccessPermission(context = context)
-                    showUsageAccessAlertDialog = false
-                },
-                title = "\"Usage Access\" is not enabled!",
-                text = "For the app to work correctly, please enable the permission \"Usage Access\".",
-            )
-        }
-
-        if (usageAccessAllowed && showOverlayAlertDialog) {
-            PrimaryAlertDialog(
-                onDismissRequest = { showOverlayAlertDialog = false },
-                onConfirm = {
-                    requestOverlayPermission(context = context)
-                    showOverlayAlertDialog = false
-                },
-                title = "\"Appear on top of other apps\" is not enabled!",
-                text = "For the app to work correctly, please enable the permission \"Appear on top of other apps\".",
-            )
-        }
+    val navController = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        permissionsRoute(navController = navController)
+        appsRoute(navController = navController)
     }
 }
 
@@ -155,40 +90,19 @@ fun MainActivityContent(
 fun MainActivityContentPreview() {
     AppLockDemoTheme {
         MainActivityContent(
-            context = LocalContext.current,
-            uiState = MainState(
-                apps = listOf(
-                    AppInfo(
-                        name = "Instagram",
-                        packageName = "com.android.instagram",
-                        locked = false,
-                    ),
-                    AppInfo(
-                        name = "YouTube",
-                        packageName = "com.android.youtube",
-                        locked = false,
-                    ),
-                    AppInfo(
-                        name = "Chrome",
-                        packageName = "com.google.android.chrome",
-                        locked = false,
-                    ),
-                ),
-            ),
-            usageAccessAllowed = true,
-            overlayPermissionAllowed = true,
-            onAction = {},
+            startDestination = Screens.Apps
         )
     }
 }
 
-private fun requestRequiredPermissions(activity: Activity) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-            0,
-        )
+private fun isNotificationPermissionAllowed(context: Context): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+    } else {
+        true
     }
 }
 
@@ -210,29 +124,6 @@ private fun isUsageAccessPermissionAllowed(context: Context): Boolean {
     return mode == AppOpsManager.MODE_ALLOWED
 }
 
-private fun startAppBlockerService(context: Context) {
-    val intent = Intent(context, AppBlockerService::class.java)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        context.startForegroundService(intent)
-    } else {
-        context.startService(intent)
-    }
-}
-
-private fun requestUsageAccessPermission(context: Context) {
-    val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
-    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    context.startActivity(intent)
-}
-
 private fun isOverlayPermissionAllowed(context: Context): Boolean {
     return Settings.canDrawOverlays(context)
-}
-
-private fun requestOverlayPermission(context: Context) {
-    val intent = Intent(
-        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-        "package:${context.packageName}".toUri()
-    )
-    context.startActivity(intent)
 }

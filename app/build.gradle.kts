@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -63,6 +64,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // navigation
+    implementation(libs.androidx.navigation.compose)
+    // serialization
+    implementation(libs.kotlinx.serialization.json)
     // extended material icons
     implementation(libs.androidx.material.icons.extended)
     // coil
@@ -76,5 +81,4 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
-
 }

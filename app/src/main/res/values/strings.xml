@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">AppLock Demo</string>
+
+    <!-- Permissions screen -->
+    <string name="permission_usage_access">Usage access</string>
+    <string name="permission_description_usage_access">To get the list of apps, allow this permission</string>
+    <string name="permission_overlay">Appear on top of other apps</string>
+    <string name="permission_description_overlay">To show the lock screen, allow this permission.</string>
+    <string name="permission_notification">Notifications</string>
+    <string name="permission_description_notification">To make the app work correctly, allow showing notifications.</string>
+    <string name="allow">Allow</string>
 </resources>

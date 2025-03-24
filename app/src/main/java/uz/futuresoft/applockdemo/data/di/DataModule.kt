@@ -6,7 +6,7 @@ import uz.futuresoft.applockdemo.data.SharedPreferencesManager
 import uz.futuresoft.applockdemo.data.database.AppDatabase
 import uz.futuresoft.applockdemo.data.repositories.AppRepository
 import uz.futuresoft.applockdemo.data.repositories.AppRepositoryImpl
-import uz.futuresoft.applockdemo.presentation.utils.DeviceAppsManager
+import uz.futuresoft.applockdemo.presentation.screens.apps.utils.DeviceAppsManager
 
 val dataModule = module {
     single { AppDatabase.create(context = androidContext()) }

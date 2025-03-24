@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo.presentation.components
+package uz.futuresoft.applockdemo.presentation.screens.apps.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
-import uz.futuresoft.applockdemo.presentation.utils.AppInfo
+import uz.futuresoft.applockdemo.presentation.screens.apps.utils.AppInfo
 import uz.futuresoft.applockdemo.utils.getAppIcon
 
 @Composable

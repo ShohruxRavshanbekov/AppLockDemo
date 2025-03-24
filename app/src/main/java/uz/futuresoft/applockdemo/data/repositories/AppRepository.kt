@@ -1,7 +1,7 @@
 package uz.futuresoft.applockdemo.data.repositories
 
 import kotlinx.coroutines.flow.Flow
-import uz.futuresoft.applockdemo.presentation.utils.AppInfo
+import uz.futuresoft.applockdemo.presentation.screens.apps.utils.AppInfo
 
 interface AppRepository {
     fun getApps(): Flow<List<AppInfo>>

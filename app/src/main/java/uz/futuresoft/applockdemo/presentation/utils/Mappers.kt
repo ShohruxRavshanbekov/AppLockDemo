@@ -1,6 +1,7 @@
 package uz.futuresoft.applockdemo.presentation.utils
 
 import uz.futuresoft.applockdemo.data.database.AppEntity
+import uz.futuresoft.applockdemo.presentation.screens.apps.utils.AppInfo
 
 fun AppInfo.toAppEntity(): AppEntity {
     return AppEntity(

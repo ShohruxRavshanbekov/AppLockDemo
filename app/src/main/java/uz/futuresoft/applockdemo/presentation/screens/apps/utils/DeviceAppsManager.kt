@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo.presentation.utils
+package uz.futuresoft.applockdemo.presentation.screens.apps.utils
 
 import android.content.Context
 import android.content.Intent

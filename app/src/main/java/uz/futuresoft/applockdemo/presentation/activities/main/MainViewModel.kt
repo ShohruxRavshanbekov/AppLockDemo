@@ -8,45 +8,29 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import uz.futuresoft.applockdemo.data.SharedPreferencesManager
 import uz.futuresoft.applockdemo.data.repositories.AppRepository
+import uz.futuresoft.applockdemo.presentation.navigation.Screens
 
-class MainViewModel(private val appRepository: AppRepository) : ViewModel() {
+class MainViewModel(private val sharedPreferencesManager: SharedPreferencesManager) : ViewModel() {
     private val _uiState = MutableStateFlow(MainState())
     val uiState: StateFlow<MainState> = _uiState.asStateFlow()
 
     init {
-        loadApps()
-    }
-
-    fun onAction(action: MainAction) {
-        when (action) {
-            MainAction.RefreshData -> loadApps()
-            is MainAction.ChangeAppLockedStatus -> changeAppLockStatus(
-                isLocked = action.status,
-                packageName = action.packageName
+        _uiState.update {
+            it.copy(
+                startDestination = if (sharedPreferencesManager.arePermissionsAllowed()) Screens.Apps else Screens.Permissions
             )
         }
     }
 
-    private fun loadApps() {
-        _uiState.update { it.copy(loading = true) }
-        viewModelScope.launch(Dispatchers.IO) {
-            appRepository.getApps().collect { apps ->
-                _uiState.update { currentState ->
-                    currentState.copy(loading = false, apps = apps)
-                }
-            }
+    fun onAction(action: MainAction) {
+        when (action) {
+            MainAction.PermissionsAllowed -> changePermissionsState()
         }
     }
 
-    private fun changeAppLockStatus(isLocked: Boolean, packageName: String) {
-        viewModelScope.launch {
-            appRepository.updateLockStatus(packageName = packageName, lockStatus = isLocked)
-            appRepository.getApps().collect { apps ->
-                _uiState.update { currentState ->
-                    currentState.copy(apps = apps)
-                }
-            }
-        }
+    private fun changePermissionsState() {
+        sharedPreferencesManager.setPermissionsState(permissionsAllowed = true)
     }
 }

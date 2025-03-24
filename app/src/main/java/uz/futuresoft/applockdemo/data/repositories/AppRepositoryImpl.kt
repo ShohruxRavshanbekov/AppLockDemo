@@ -2,12 +2,9 @@ package uz.futuresoft.applockdemo.data.repositories
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import uz.futuresoft.applockdemo.data.database.AppDao
-import uz.futuresoft.applockdemo.data.database.AppDatabase
-import uz.futuresoft.applockdemo.presentation.utils.AppInfo
-import uz.futuresoft.applockdemo.presentation.utils.DeviceAppsManager
+import uz.futuresoft.applockdemo.presentation.screens.apps.utils.AppInfo
+import uz.futuresoft.applockdemo.presentation.screens.apps.utils.DeviceAppsManager
 import uz.futuresoft.applockdemo.presentation.utils.toAppEntity
 import uz.futuresoft.applockdemo.presentation.utils.toAppInfo
 

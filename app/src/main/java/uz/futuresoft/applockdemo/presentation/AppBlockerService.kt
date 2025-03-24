@@ -35,6 +35,7 @@ class AppBlockerService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopSelf()
         isRunning = false
     }
 
