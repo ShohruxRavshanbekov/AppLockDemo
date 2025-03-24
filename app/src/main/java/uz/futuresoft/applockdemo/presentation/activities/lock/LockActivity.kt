@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo.presentation
+package uz.futuresoft.applockdemo.presentation.activities.lock
 
 import android.content.Context
 import android.content.Intent
@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,36 +23,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
-import uz.futuresoft.applockdemo.presentation.view_model.SharedState
-import uz.futuresoft.applockdemo.presentation.view_model.SharedViewModel
+import uz.futuresoft.applockdemo.presentation.activities.main.MainState
 
-class BlockScreenActivity : ComponentActivity() {
+class LockActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-//            val viewModel = koinViewModel<SharedViewModel>()
-//            val sharedUiState by viewModel.sharedUiState.collectAsStateWithLifecycle()
-//            val blockedAppPackageName = intent.getStringExtra("packageName")
+            val viewModel = koinViewModel<LockViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val lockedAppPackageName = intent.getStringExtra("packageName") as String
 
-//            LaunchedEffect(key1 = Unit) {
-//                viewModel.onAction(
-//                    SharedAction.GetApp(
-//                        context = this@BlockScreenActivity,
-//                        packageName = blockedAppPackageName,
-//                    )
-//                )
-//            }
+            LaunchedEffect(key1 = lockedAppPackageName) {
+                viewModel.onAction(LockAction.GetApp(lockedAppPackageName))
+            }
 
             AppLockDemoTheme {
-                BlockScreenActivityContent(sharedUiState = SharedState())
+                LockScreenActivityContent(uiState = uiState)
             }
         }
     }
 }
 
 @Composable
-private fun BlockScreenActivityContent(sharedUiState: SharedState) {
+private fun LockScreenActivityContent(uiState: LockState) {
     val context = LocalContext.current
 
     Scaffold { innerPadding ->
@@ -63,8 +57,8 @@ private fun BlockScreenActivityContent(sharedUiState: SharedState) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-//            Text(text = "${sharedUiState.app?.name} заблокировано")
-            Text(text = "Приложение заблокировано")
+            Text(text = "${uiState.app.name} заблокировано")
+//            Text(text = "Приложение заблокировано")
 
             BackHandler {
                 closeApp(context = context)
@@ -75,9 +69,9 @@ private fun BlockScreenActivityContent(sharedUiState: SharedState) {
 
 @Preview
 @Composable
-private fun BlockScreenActivityPreview() {
+private fun LockScreenActivityPreview() {
     AppLockDemoTheme {
-        BlockScreenActivityContent(sharedUiState = SharedState())
+        LockScreenActivityContent(uiState = LockState())
     }
 }
 

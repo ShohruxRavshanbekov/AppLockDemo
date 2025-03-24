@@ -22,14 +22,14 @@
         android:theme="@style/Theme.AppLockDemo"
         tools:targetApi="31">
         <activity
-            android:name=".presentation.BlockScreenActivity"
+            android:name=".presentation.activities.lock.LockActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity
-            android:name=".presentation.MainActivity"
+            android:name=".presentation.activities.main.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.AppLockDemo">
             <intent-filter>
@@ -45,7 +45,7 @@
             android:foregroundServiceType="specialUse" />
 
         <receiver
-            android:name=".presentation.utils.BootReceiver"
+            android:name=".presentation.receivers.BootReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

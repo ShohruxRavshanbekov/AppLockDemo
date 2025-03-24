@@ -1,4 +1,4 @@
-package uz.futuresoft.applockdemo.presentation.utils
+package uz.futuresoft.applockdemo.presentation.receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context

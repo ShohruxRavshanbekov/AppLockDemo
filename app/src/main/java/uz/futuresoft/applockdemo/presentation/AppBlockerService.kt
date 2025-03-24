@@ -11,10 +11,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import uz.futuresoft.applockdemo.R
-import uz.futuresoft.applockdemo.data.SharedPreferencesManager2
+import uz.futuresoft.applockdemo.data.database.AppDao
+import uz.futuresoft.applockdemo.presentation.activities.lock.LockActivity
 
 class AppBlockerService : Service() {
+    private val appDao: AppDao by inject()
     private var isRunning = false
 
     override fun onCreate() {
@@ -38,7 +41,9 @@ class AppBlockerService : Service() {
     private fun startAppMonitoring() {
         CoroutineScope(Dispatchers.IO).launch {
             while (isRunning) {
-                val blockedApps = SharedPreferencesManager2.getBlockedApps()
+                val blockedApps = appDao.getApps()
+                    .filter { it.locked }
+                    .map { it.packageName }
                 val launchedApp = getLaunchedApp(this@AppBlockerService)
                 if (blockedApps.contains(launchedApp)) {
                     showLockScreen(packageName = launchedApp)
@@ -67,7 +72,7 @@ class AppBlockerService : Service() {
 
     // This method shows the lock screen on top of the blocked app
     private fun showLockScreen(packageName: String?) {
-        val intent = Intent(this, BlockScreenActivity::class.java)
+        val intent = Intent(this, LockActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                 Intent.FLAG_ACTIVITY_CLEAR_TASK or
                 Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS

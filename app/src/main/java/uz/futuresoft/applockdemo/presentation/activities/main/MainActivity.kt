@@ -1,4 +1,6 @@
-package uz.futuresoft.applockdemo.presentation
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package uz.futuresoft.applockdemo.presentation.activities.main
 
 import android.Manifest
 import android.app.Activity
@@ -9,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,7 +21,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,13 +39,11 @@ import androidx.core.app.ActivityCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
+import uz.futuresoft.applockdemo.presentation.AppBlockerService
 import uz.futuresoft.applockdemo.presentation.components.AppItem
 import uz.futuresoft.applockdemo.presentation.components.PrimaryAlertDialog
 import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
 import uz.futuresoft.applockdemo.presentation.utils.AppInfo
-import uz.futuresoft.applockdemo.presentation.view_model.SharedAction
-import uz.futuresoft.applockdemo.presentation.view_model.SharedState
-import uz.futuresoft.applockdemo.presentation.view_model.SharedViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,8 +51,8 @@ class MainActivity : ComponentActivity() {
         requestRequiredPermissions(activity = this)
         enableEdgeToEdge()
         setContent {
-            val viewModel = koinViewModel<SharedViewModel>()
-            val sharedUiState by viewModel.sharedUiState.collectAsStateWithLifecycle()
+            val viewModel = koinViewModel<MainViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val usageAccessAllowed by remember {
                 mutableStateOf(isUsageAccessPermissionAllowed(context = this))
             }
@@ -56,19 +60,14 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(isOverlayPermissionAllowed(context = this))
             }
 
-
             if (usageAccessAllowed) {
                 startAppBlockerService(context = this)
             }
 
-            LaunchedEffect(key1 = Unit) {
-                viewModel.onAction(SharedAction.GetApps(context = this@MainActivity))
-            }
-
             AppLockDemoTheme {
-                Content(
+                MainActivityContent(
                     context = this,
-                    sharedUiState = sharedUiState,
+                    uiState = uiState,
                     usageAccessAllowed = usageAccessAllowed,
                     overlayPermissionAllowed = overlayPermissionAllowed,
                     onAction = viewModel::onAction
@@ -79,36 +78,49 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(
+fun MainActivityContent(
     context: Context,
-    sharedUiState: SharedState,
+    uiState: MainState,
     usageAccessAllowed: Boolean,
     overlayPermissionAllowed: Boolean,
-    onAction: (SharedAction) -> Unit,
+    onAction: (MainAction) -> Unit,
 ) {
+    val pullToRefreshState = rememberPullToRefreshState()
+    var isRefreshing by remember { mutableStateOf(false) }
     var showUsageAccessAlertDialog by remember { mutableStateOf(!usageAccessAllowed) }
     var showOverlayAlertDialog by remember { mutableStateOf(!overlayPermissionAllowed) }
 
+    LaunchedEffect(key1 = uiState.loading) {
+        isRefreshing = uiState.loading
+    }
+
     Scaffold { innerPadding ->
-        LazyColumn(
+        PullToRefreshBox(
+            isRefreshing = uiState.loading,
+            onRefresh = { onAction(MainAction.RefreshData) },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(20.dp),
+            state = pullToRefreshState,
         ) {
-            items(sharedUiState.apps) { appInfo ->
-                AppItem(
-                    appInfo = appInfo,
-                    onChangeLockStatus = {
-                        onAction(
-                            SharedAction.OnChangeAppBlockedStatus(
-                                status = it,
-                                packageName = appInfo.packageName
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(20.dp),
+            ) {
+                items(uiState.apps) { appInfo ->
+                    AppItem(
+                        appInfo = appInfo,
+                        onChangeLockStatus = {
+                            onAction(
+                                MainAction.ChangeAppLockedStatus(
+                                    status = it,
+                                    packageName = appInfo.packageName
+                                )
                             )
-                        )
-                    },
-                )
+                        },
+                    )
+                }
             }
         }
 
@@ -142,9 +154,9 @@ fun Content(
 @Composable
 fun MainActivityContentPreview() {
     AppLockDemoTheme {
-        Content(
+        MainActivityContent(
             context = LocalContext.current,
-            sharedUiState = SharedState(
+            uiState = MainState(
                 apps = listOf(
                     AppInfo(
                         name = "Instagram",

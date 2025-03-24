@@ -7,15 +7,18 @@ import androidx.room.Query
 
 @Dao
 interface AppDao {
-    @Query("SELECT * FROM app")
-    fun getApps(): List<AppEntity>
+    @Query("SELECT * FROM apps")
+    suspend fun getApps(): List<AppEntity>
 
-    @Query("SELECT * FROM app WHERE packageName LIKE :packageName")
-    fun getApp(packageName: String): AppEntity
-
-    @Query("UPDATE app SET locked = :locked WHERE packageName = :packageName")
-    fun changeAppLockStatus(packageName: String, locked: Boolean)
+    @Query("SELECT * FROM apps WHERE packageName LIKE :packageName")
+    suspend fun getApp(packageName: String): AppEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(apps: List<AppEntity>)
+    suspend fun insertApps(apps: List<AppEntity>)
+
+    @Query("UPDATE apps SET locked = :locked WHERE packageName = :packageName")
+    suspend fun updateLockStatus(packageName: String, locked: Boolean)
+
+    @Query("DELETE FROM apps WHERE packageName = :packageName")
+    suspend fun deleteApp(packageName: String)
 }
