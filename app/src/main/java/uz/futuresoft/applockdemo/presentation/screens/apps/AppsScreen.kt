@@ -29,15 +29,12 @@ import uz.futuresoft.applockdemo.presentation.screens.apps.utils.AppInfo
 
 @Composable
 fun AppsScreen(
-    navController: NavHostController,
     viewModel: AppsViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AppsScreenContent(
         uiState = uiState,
-        usageAccessAllowed = true,
-        overlayPermissionAllowed = true,
         onAction = viewModel::onAction,
     )
 }
@@ -45,14 +42,10 @@ fun AppsScreen(
 @Composable
 fun AppsScreenContent(
     uiState: AppsState,
-    usageAccessAllowed: Boolean,
-    overlayPermissionAllowed: Boolean,
     onAction: (AppsAction) -> Unit,
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
-    var showUsageAccessAlertDialog by remember { mutableStateOf(!usageAccessAllowed) }
-    var showOverlayAlertDialog by remember { mutableStateOf(!overlayPermissionAllowed) }
 
     LaunchedEffect(key1 = uiState.loading) {
         isRefreshing = uiState.loading
@@ -87,30 +80,6 @@ fun AppsScreenContent(
                 }
             }
         }
-
-//        if (showUsageAccessAlertDialog) {
-//            PrimaryAlertDialog(
-//                onDismissRequest = { showUsageAccessAlertDialog = false },
-//                onConfirm = {
-//                    requestUsageAccessPermission(context = context)
-//                    showUsageAccessAlertDialog = false
-//                },
-//                title = "\"Usage Access\" is not enabled!",
-//                text = "For the app to work correctly, please enable the permission \"Usage Access\".",
-//            )
-//        }
-//
-//        if (usageAccessAllowed && showOverlayAlertDialog) {
-//            PrimaryAlertDialog(
-//                onDismissRequest = { showOverlayAlertDialog = false },
-//                onConfirm = {
-//                    requestOverlayPermission(context = context)
-//                    showOverlayAlertDialog = false
-//                },
-//                title = "\"Appear on top of other apps\" is not enabled!",
-//                text = "For the app to work correctly, please enable the permission \"Appear on top of other apps\".",
-//            )
-//        }
     }
 }
 
@@ -138,8 +107,6 @@ private fun AppsScreenPreview() {
                     ),
                 ),
             ),
-            usageAccessAllowed = true,
-            overlayPermissionAllowed = true,
             onAction = {},
         )
     }

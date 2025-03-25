@@ -8,15 +8,10 @@ import uz.futuresoft.applockdemo.presentation.navigation.Screens
 import uz.futuresoft.applockdemo.presentation.screens.apps.AppsScreen
 import uz.futuresoft.applockdemo.presentation.screens.apps.AppsViewModel
 
-fun NavGraphBuilder.appsRoute(
-    navController: NavHostController,
-) {
+fun NavGraphBuilder.appsRoute() {
     composable<Screens.Apps> {
         val viewModel = koinViewModel<AppsViewModel>()
 
-        AppsScreen(
-            navController = navController,
-            viewModel = viewModel
-        )
+        AppsScreen(viewModel = viewModel)
     }
 }

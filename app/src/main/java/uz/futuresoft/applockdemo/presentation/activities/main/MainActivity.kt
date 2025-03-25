@@ -12,6 +12,7 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -78,10 +79,10 @@ fun MainActivityContent(
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
     ) {
         permissionsRoute(navController = navController)
-        appsRoute(navController = navController)
+        appsRoute()
     }
 }
 

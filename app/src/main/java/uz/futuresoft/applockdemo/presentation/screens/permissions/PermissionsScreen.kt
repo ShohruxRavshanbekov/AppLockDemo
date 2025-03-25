@@ -57,6 +57,7 @@ import uz.futuresoft.applockdemo.presentation.ui.theme.AppLockDemoTheme
 @Composable
 fun PermissionsScreen(
     navController: NavHostController,
+    viewModel: PermissionsViewModel,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -73,6 +74,10 @@ fun PermissionsScreen(
             if (event == Lifecycle.Event.ON_RESUME) {
                 isUsageAccessPermissionAllowed = isUsageAccessPermissionAllowed(context = context)
                 isOverlayPermissionAllowed = isOverlayPermissionAllowed(context = context)
+                Log.d(
+                    "AAAAA",
+                    "PermissionsScreen(DisposableEffect): isOverlayPermissionAllowed = $isOverlayPermissionAllowed"
+                )
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -97,7 +102,10 @@ fun PermissionsScreen(
                 PermissionsAction.RequestNotificationPermission -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
+
+                else -> Unit
             }
+            viewModel.onAction(action)
         }
     )
 }
@@ -136,16 +144,17 @@ fun PermissionsScreenContent(
         key2 = isOverlayPermissionAllowed,
         key3 = isNotificationPermissionAllowed
     ) {
-        when {
-            isNotificationPermissionAllowed -> pagerState.animateScrollToPage(page = pagerState.currentPage + 1)
-            isOverlayPermissionAllowed -> {
-                onAction(PermissionsAction.NavigateToAppsScreen)
-                Log.d("AAAAA", "PermissionsScreenContent: it works")
+        when (pagerState.currentPage) {
+            0 -> if (isNotificationPermissionAllowed) pagerState.animateScrollToPage(page = pagerState.currentPage + 1)
+            1 -> if (isUsageAccessPermissionAllowed) {
+                startAppBlockerService(context)
+                delay(500)
+                pagerState.animateScrollToPage(page = pagerState.currentPage + 1)
             }
 
-            isUsageAccessPermissionAllowed -> {
-                startAppBlockerService(context = context)
-                pagerState.animateScrollToPage(page = pagerState.currentPage + 1)
+            2 -> if (isOverlayPermissionAllowed) {
+                onAction(PermissionsAction.NavigateToAppsScreen)
+                onAction(PermissionsAction.PermissionsAllowed)
             }
         }
     }
