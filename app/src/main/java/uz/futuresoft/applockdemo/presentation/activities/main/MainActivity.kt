@@ -1,7 +1,6 @@
 package uz.futuresoft.applockdemo.presentation.activities.main
 
 import android.Manifest
-import android.app.Activity
 import android.app.AppOpsManager
 import android.content.Context
 import android.content.pm.PackageManager
@@ -18,9 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.tooling.data.ContextCache
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
